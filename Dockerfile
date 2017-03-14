@@ -31,7 +31,7 @@ RUN go build go.roman.zone/bici
 COPY ./res /go/bin/res
 
 # Styling
-WORKDIR /go/src/go.roman.zone/bici/res/static/styles
+WORKDIR /go/bin/res/static/styles
 RUN gem install sass
 RUN scss main.scss:main.css
 
