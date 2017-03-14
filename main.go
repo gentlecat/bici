@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go.roman.zone/turbo-parakeet/server"
-	"go.roman.zone/turbo-parakeet/storage"
+	"go.roman.zone/bici/server"
+	"go.roman.zone/bici/storage"
 	"log"
 	"net/http"
 )

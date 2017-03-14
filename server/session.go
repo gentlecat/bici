@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/strava/go.strava"
-	"go.roman.zone/turbo-parakeet/storage"
+	"go.roman.zone/bici/storage"
 	"net/http"
 	"os"
 )
