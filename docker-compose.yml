@@ -18,6 +18,8 @@ services:
       context: .
       dockerfile: ./Dockerfile
     environment:
+      OAUTH_CALLBACK_PROTOCOL: http
+      OAUTH_CALLBACK_HOST: localhost
       ACCESS_TOKEN: SOMETOKEN
       COOKIE_KEY: SOMEKEY
       STRAVA_CLIENT_ID: 42

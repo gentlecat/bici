@@ -46,7 +46,8 @@ func StartServer() {
 	strava.ClientId = clientID
 	strava.ClientSecret = os.Getenv("STRAVA_CLIENT_SECRET")
 	stravaAuth = &strava.OAuthAuthenticator{
-		CallbackURL:            fmt.Sprintf("http://localhost:%d/oauth", *listenPort),
+		CallbackURL: fmt.Sprintf("%s://%s:%d/oauth",
+			os.Getenv("OAUTH_CALLBACK_PROTOCOL"), os.Getenv("OAUTH_CALLBACK_HOST"), *listenPort),
 		RequestClientGenerator: nil,
 	}
 
