@@ -4,6 +4,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
                     libpq-dev \
                     git \
+                    ruby-full \
                     runit && \
     rm -rf /var/lib/apt/lists/*
 
@@ -29,10 +30,16 @@ RUN go get -v ./...
 RUN go build go.roman.zone/bici
 COPY ./res /go/bin/res
 
+# Styling
+WORKDIR /go/src/go.roman.zone/bici/res/static/styles
+RUN gem install sass
+RUN scss main.scss:main.css
+
 # Service
 COPY ./web.service /etc/sv/web/run
 RUN chmod 755 /etc/sv/web/run && \
     ln -sf /etc/sv/web /etc/service/
 
+WORKDIR /go
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/runsvinit"]
