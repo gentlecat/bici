@@ -1,0 +1,30 @@
+version: "2"
+services:
+
+  db:
+    image: postgres:9.6
+    volumes:
+      - ./data/pgdata:/var/lib/postgresql/data/pgdata
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: summits
+      POSTGRES_PASSWORD: summits
+      POSTGRES_DB: summits
+    ports:
+      - "5432:5432"
+
+  web:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      ACCESS_TOKEN: SOMETOKEN
+      COOKIE_KEY: SOMEKEY
+      STRAVA_CLIENT_ID: 42
+      STRAVA_CLIENT_SECRET: SOMESECRET
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/go/src/go.roman.zone/turbo-parakeet
+    links:
+      - db

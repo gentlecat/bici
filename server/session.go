@@ -1,0 +1,77 @@
+package server
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/sessions"
+	"github.com/strava/go.strava"
+	"go.roman.zone/turbo-parakeet/storage"
+	"net/http"
+	"os"
+)
+
+const (
+	CLUB_ID = 262311
+
+	SESSION_NAME     = "that_session"
+	SESSION_KEY_USER = "athlete"
+)
+
+var (
+	store = sessions.NewCookieStore([]byte(os.Getenv("COOKIE_KEY")))
+
+	stravaAuth *strava.OAuthAuthenticator
+
+	// TODO: REMOVE THIS:
+	access_token = os.Getenv("ACCESS_TOKEN")
+)
+
+type UserSession struct {
+	ID int64
+}
+
+func authSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
+	// Get a session. We're ignoring the error resulted from decoding an
+	// existing session: Get() always returns a session, even if empty.
+	session, err := store.Get(r, SESSION_NAME)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Set some session values.
+	// TODO: Save access token
+	session.Values[SESSION_KEY_USER] = UserSession{
+		ID: auth.Athlete.AthleteSummary.AthleteMeta.Id,
+	}
+	// Save it before we write to the response/return from the handler.
+	err = session.Save(r, w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = storage.SaveAthleteDetails(auth.Athlete)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	content, _ := json.MarshalIndent(auth.Athlete, "", " ")
+	fmt.Fprint(w, string(content))
+}
+
+func authFailure(err error, w http.ResponseWriter, r *http.Request) {
+	if err == strava.OAuthAuthorizationDeniedErr {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, stravaAuth.AuthorizationURL("pointless_state", strava.Permissions.Public, true),
+		http.StatusTemporaryRedirect)
+}

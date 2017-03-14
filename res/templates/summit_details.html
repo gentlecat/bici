@@ -1,0 +1,21 @@
+{{define "content"}}
+<div id="page-summit-details">
+  <h1 class="name"><span class="number">#{{.Data.ID}}</span>: {{.Data.Name}}</h1>
+  <div class="hotness">
+    {{range sliceify .Data.Points}}
+      <img src="/static/images/pepper.svg" />
+    {{end}}
+  </div>
+
+  <h2>Segments</h2>
+  <ul class="segments">
+    {{range .Data.Segments}}
+      <li>
+        <a href="https://www.strava.com/segments/{{.Id}}">{{.Name}}</a>
+        <span class="summary">({{formatDecimal (divide .Distance 1000)}}km, {{formatDecimal (subtract .ElevationHigh .ElevationLow)}}m, {{.AverageGrade}}%)</span>
+      </li>
+    {{end}}
+  </ul>
+
+</div>
+{{end}}

@@ -1,0 +1,23 @@
+{{define "content"}}
+<div id="page-athlete">
+  <div class="top">
+    <h1 class="name">
+      <img class="avatar" src="{{.Data.Athlete.Profile}}" />
+      {{.Data.Athlete.FirstName}} {{.Data.Athlete.LastName}}
+    </h1>
+    <div class="right-controls">
+      <a class="strava-profile" href="https://www.strava.com/athletes/{{.Data.Athlete.Id}}">View on Strava</a>
+    </div>
+  </div>
+
+  <h2 class="clear">Activities</h2>
+  <ul>
+    {{range .Data.SummitActivities}}
+      <li>
+        {{.Activity.Name}}
+        <br /><span class="muted">Summit efforts: <a href="/summits/{{.Summit.ID}}">{{.Summit.Name}}</a> ({{.Summit.Points}}p)</span>
+      </li>
+    {{end}}
+  </ul>
+</div>
+{{end}}

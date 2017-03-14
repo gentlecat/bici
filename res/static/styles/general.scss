@@ -1,0 +1,60 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("/static/fonts/Montserrat/Montserrat-Regular.ttf");
+  font-display: optional;
+}
+
+@font-face {
+  font-family: "Inconsolata";
+  src: url("/static/fonts/Inconsolata/Inconsolata-Regular.ttf");
+  font-display: optional;
+}
+
+@mixin muted {
+  color: #888;
+}
+
+.muted { @include muted(); }
+
+a {
+  color: #05161e;
+  text-decoration: none;
+  border-bottom: 1px dashed #0483c3;
+
+  &:hover {
+    color: #0483c3;
+    text-decoration: none;
+    border-bottom: 1px solid;
+  }
+}
+
+h1 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: normal;
+  line-height: 30px;
+}
+
+hr {
+  -webkit-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+  overflow: visible;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, .1);
+}
+
+code {
+  font-family: "Inconsolata", monospace;
+  background: #F0F0F0;
+}
+
+.date {
+  font-family: "Inconsolata", monospace;
+  color: #888;
+}
+
+.clear {
+  clear: both;
+}

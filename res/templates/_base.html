@@ -1,0 +1,34 @@
+{{define "base"}}
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge" />
+  {{if .Title}}
+    <title>{{.Title}} - A Thing</title>
+  {{else}}
+    <title>A Thing</title>
+  {{end}}
+  <link rel="stylesheet" href="/static/styles/main.css" />
+</head>
+
+<body>
+
+<header>
+  <div class="title"><a href="/">A Thing</a></div>
+</header>
+
+<div class="content">
+  {{template "content" .}}
+</div>
+
+<footer>
+  <hr />
+  <div class="left"></div>
+  <div class="right"><img class="strava-credit" src="/static/images/powered_by_strava.svg"></div>
+</footer>
+
+</body>
+
+</html>
+{{end}}
