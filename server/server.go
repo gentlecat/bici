@@ -45,9 +45,14 @@ func StartServer() {
 	check(err)
 	strava.ClientId = clientID
 	strava.ClientSecret = os.Getenv("STRAVA_CLIENT_SECRET")
+	callbackURL := fmt.Sprintf("%s://%s/oauth",
+		os.Getenv("OAUTH_CALLBACK_PROTOCOL"), os.Getenv("OAUTH_CALLBACK_HOST"))
+	if os.Getenv("OAUTH_CALLBACK_HOST") == "localhost" || os.Getenv("OAUTH_CALLBACK_HOST") == "127.0.0.1" {
+		callbackURL = fmt.Sprintf("%s://%s:%d/oauth",
+			os.Getenv("OAUTH_CALLBACK_PROTOCOL"), os.Getenv("OAUTH_CALLBACK_HOST"), *listenPort)
+	}
 	stravaAuth = &strava.OAuthAuthenticator{
-		CallbackURL: fmt.Sprintf("%s://%s:%d/oauth",
-			os.Getenv("OAUTH_CALLBACK_PROTOCOL"), os.Getenv("OAUTH_CALLBACK_HOST"), *listenPort),
+		CallbackURL:            callbackURL,
 		RequestClientGenerator: nil,
 	}
 
