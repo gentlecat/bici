@@ -30,7 +30,31 @@ type UserSession struct {
 	ID int64
 }
 
-func authSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
+func GetCurrentSession(r *http.Request) (isLoggedIn bool, currentUser *strava.AthleteDetailed, err error) {
+	session, err := store.Get(r, SESSION_NAME)
+	if err != nil {
+		// No session
+		return false, currentUser, err
+	}
+	userSessionInterf, ok := session.Values[SESSION_KEY_USER]
+	if !ok {
+		// Session is there, but correct key isn't
+		return false, currentUser, err
+	}
+	userSession, ok := userSessionInterf.(*UserSession)
+	if !ok {
+		return false, currentUser, err
+	}
+
+	loggedInUser, err := storage.GetAthlete(userSession.ID)
+	if err != nil {
+		return false, currentUser, err
+	}
+
+	return true, &loggedInUser, nil
+}
+
+func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
 	// Get a session. We're ignoring the error resulted from decoding an
 	// existing session: Get() always returns a session, even if empty.
 	session, err := store.Get(r, SESSION_NAME)
@@ -61,7 +85,7 @@ func authSuccess(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *h
 	fmt.Fprint(w, string(content))
 }
 
-func authFailure(err error, w http.ResponseWriter, r *http.Request) {
+func authFailureHandler(err error, w http.ResponseWriter, r *http.Request) {
 	if err == strava.OAuthAuthorizationDeniedErr {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

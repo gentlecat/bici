@@ -16,6 +16,21 @@
 
 <header>
   <div class="title"><a href="/">A Thing</a></div>
+  <ul class="left">
+    <li><a href="/about">About</a></li>
+    <li><a href="/athletes">Athletes</a></li>
+    <li><a href="/summits">Summits</a></li>
+  </ul>
+  <ul class="right">
+    {{if .IsLoggedIn}}
+      <li class="user">
+        <img class="avatar" src="{{.User.Profile}}" />
+        <a class="name" href="/athletes/{{.User.Id}}">{{.User.FirstName}}</a>
+      </li>
+    {{else}}
+      <li><a class="login-link" href="/login"><img src="/static/images/connect_with_strava.svg" /></a></li>
+    {{end}}
+  </ul>
 </header>
 
 <div class="content">

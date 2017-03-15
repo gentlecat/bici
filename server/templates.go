@@ -7,6 +7,8 @@ import (
 	"log"
 	"path/filepath"
 	"sync"
+	"github.com/strava/go.strava"
+	"net/http"
 )
 
 var (
@@ -32,6 +34,11 @@ var (
 	}
 )
 
+type Page struct {
+	Title string
+	Data  interface{}
+}
+
 func renderTemplates(location string) {
 	log.Println("Rendering templates...")
 	defer log.Println("Done!")
@@ -53,8 +60,21 @@ func getTemplate(location, fileName string) *template.Template {
 	))
 }
 
-func renderTemplate(name string, wr io.Writer, data interface{}) error {
+func renderTemplate(name string, wr io.Writer, r *http.Request, data Page) error {
 	templatesMutex.Lock()
 	defer templatesMutex.Unlock()
-	return templates[name].ExecuteTemplate(wr, "base", data)
+	isLoggedIn, currentUser , err:= GetCurrentSession(r)
+	if err != nil {
+		log.Println(err)
+	}
+	return templates[name].ExecuteTemplate(wr, "base", struct {
+		Page
+		IsLoggedIn bool
+		User  *strava.AthleteDetailed
+	}{
+		data,
+		isLoggedIn,
+		currentUser,
+
+	})
 }

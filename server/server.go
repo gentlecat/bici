@@ -27,12 +27,6 @@ var (
 	staticFilesLoc = filepath.Join(*resourcesLoc, "static")
 )
 
-type Page struct {
-	Title string
-	User  *strava.AthleteDetailed
-	Data  interface{}
-}
-
 func StartServer() {
 	log.Println("Initializing...")
 	initAll()
@@ -85,7 +79,7 @@ func makeRouter() *mux.Router {
 	r.HandleFunc("/login", loginHandler)
 	path, err := stravaAuth.CallbackPath()
 	check(err)
-	r.HandleFunc(path, stravaAuth.HandlerFunc(authSuccess, authFailure))
+	r.HandleFunc(path, stravaAuth.HandlerFunc(authSuccessHandler, authFailureHandler))
 
 	const staticPathPrefix = "/static"
 	r.PathPrefix(staticPathPrefix).Handler(http.StripPrefix(staticPathPrefix, http.FileServer(http.Dir(staticFilesLoc))))
@@ -94,32 +88,10 @@ func makeRouter() *mux.Router {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	check(renderTemplate("index", w, Page{}))
+	check(renderTemplate("index", w, r, Page{}))
 }
 
 func athleteHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := store.Get(r, SESSION_NAME)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	userSessionInterf, ok := session.Values[SESSION_KEY_USER]
-	if !ok {
-		http.Error(w, "Can't find session info", http.StatusInternalServerError)
-		return
-	}
-	userSession, ok := userSessionInterf.(*UserSession)
-	if !ok {
-		http.Error(w, "Can't type cast user session", http.StatusInternalServerError)
-		return
-	}
-
-	loggedInUser, err := storage.GetAthlete(userSession.ID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	vars := mux.Vars(r)
 	id, err := atoi64(vars["id"])
 	if err != nil {
@@ -128,6 +100,7 @@ func athleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	athlete, err := storage.GetAthlete(id)
 	if err != nil {
+		// FIXME: This might not be a correct status to return (if athlete not found)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -138,8 +111,8 @@ func athleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	check(renderTemplate("profile", w, Page{
-		User: &loggedInUser,
+	check(renderTemplate("profile", w, r, Page{
+		Title: "Athlete",
 		Data: struct {
 			Athlete          *strava.AthleteDetailed
 			SummitActivities *[]*storage.SummitEffortActivity
@@ -204,11 +177,14 @@ func summitDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	check(renderTemplate("summit_details", w, Page{
+	check(renderTemplate("summit_details", w,r, Page{
+		Title: "Summit details",
 		Data: summit,
 	}))
 }
 
 func aboutPageHandler(w http.ResponseWriter, r *http.Request) {
-	check(renderTemplate("about", w, Page{}))
+	check(renderTemplate("about", w,r, Page{
+		Title: "About",
+	}))
 }
