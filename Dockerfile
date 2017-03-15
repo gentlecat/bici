@@ -26,7 +26,7 @@ RUN go get -u github.com/peterbourgon/runsvinit
 RUN cp $GOPATH/bin/runsvinit /usr/local/bin/
 
 COPY . /go/src/go.roman.zone/bici
-RUN go get -v ./...
+RUN go get -v $(go list ./... | grep -v /vendor/)
 RUN go build go.roman.zone/bici
 COPY ./res /go/bin/res
 
