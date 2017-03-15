@@ -1,0 +1,3 @@
+[submodule "vendor/github.com/strava/go.strava"]
+	path = vendor/github.com/strava/go.strava
+	url = git@github.com:strava/go.strava.git
