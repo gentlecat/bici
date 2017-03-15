@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/strava/go.strava"
@@ -64,7 +63,7 @@ func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWrite
 	}
 
 	// Set some session values.
-	// TODO: Save access token
+	// TODO: Save access token maybe
 	session.Values[SESSION_KEY_USER] = UserSession{
 		ID: auth.Athlete.AthleteSummary.AthleteMeta.Id,
 	}
@@ -81,8 +80,7 @@ func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWrite
 		return
 	}
 
-	content, _ := json.MarshalIndent(auth.Athlete, "", " ")
-	fmt.Fprint(w, string(content))
+	http.Redirect(w, r, fmt.Sprintf("%s://%s/athletes/%d", os.Getenv("OAUTH_CALLBACK_PROTOCOL"), os.Getenv("OAUTH_CALLBACK_HOST"), auth.Athlete.Id), http.StatusTemporaryRedirect)
 }
 
 func authFailureHandler(err error, w http.ResponseWriter, r *http.Request) {
