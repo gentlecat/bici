@@ -1,0 +1,21 @@
+{{define "content"}}
+<div id="page-summit-list">
+  <h1 class="name">Summits</h1>
+
+  <p>These are the summits that you can ride up to.</p>
+
+  <ol class="segments">
+    {{range .Data}}
+      <li>
+        <a href="/summits/{{.ID}}">{{.Name}}</a>
+        <span class="hotness">
+          {{range sliceify .Points}}
+          <img src="/static/images/pepper.svg" />
+          {{end}}
+        </span>
+      </li>
+    {{end}}
+  </ol>
+
+</div>
+{{end}}

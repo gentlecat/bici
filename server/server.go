@@ -179,7 +179,14 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func summitsHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: List of tracked summits
+	summits, err:=storage.GetAllSummits()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	check(renderTemplate("summit_list", w, r, Page{
+		Data: &summits,
+	}))
 }
 
 func summitDetailsHandler(w http.ResponseWriter, r *http.Request) {

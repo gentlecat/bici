@@ -17,6 +17,28 @@ type Summit struct {
 	Segments []*strava.SegmentSummary
 }
 
+func GetAllSummits() ([]Summit,  error) {
+	summits := make([]Summit, 0)
+
+	rows,err := db.Query("SELECT id, name, points FROM summit ORDER BY id")
+	if err != nil {
+		return summits, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var summit Summit
+		if err := rows.Scan(&summit.ID, &summit.Name, &summit.Points); err != nil {
+			return summits, err
+		}
+		summits = append(summits, summit)
+	}
+	if err := rows.Err(); err != nil {
+		return summits, err
+	}
+
+	return summits, nil
+}
+
 func GetSummit(id int64) (summit Summit, err error) {
 	// Getting basic info about the summit
 	err = db.QueryRow("SELECT id, name, points FROM summit WHERE id = $1", id).

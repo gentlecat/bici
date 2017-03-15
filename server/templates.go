@@ -42,6 +42,7 @@ func renderTemplates(location string) {
 	templates["about"] = getTemplate(location, "about.html")
 	templates["profile"] = getTemplate(location, "profile.html")
 	templates["activity"] = getTemplate(location, "activity.html")
+	templates["summit_list"] = getTemplate(location, "summit_list.html")
 	templates["summit_details"] = getTemplate(location, "summit_details.html")
 }
 
