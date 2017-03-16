@@ -2,14 +2,12 @@ package server
 
 import (
 	"encoding/gob"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/strava/go.strava"
 	"go.roman.zone/bici/storage"
 	"go.roman.zone/bici/strava/activity"
-	"go.roman.zone/bici/strava/segment"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -72,6 +70,7 @@ func makeRouter() *mux.Router {
 	r.HandleFunc("/about", aboutPageHandler)
 	r.HandleFunc("/athletes/{id:[0-9]+}", athleteHandler)
 	r.HandleFunc("/activities/{id:[0-9]+}", activityHandler)
+	r.HandleFunc("/refresh", refreshHandler)
 	r.HandleFunc("/summits", summitsHandler)
 	r.HandleFunc("/summits/{id:[0-9]+}", summitDetailsHandler)
 
@@ -132,27 +131,28 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a, err := activity.GetActivity(strava.NewClient(access_token), id)
+	http.Error(w, fmt.Sprintf("Not implemented yet. Can't view activity %d. :(", id), http.StatusTeapot)
+}
+
+func refreshHandler(w http.ResponseWriter, r *http.Request) {
+	isLoggedIn, currentUser, err := GetCurrentSession(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	if err := storage.SaveActivity(a); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if !isLoggedIn {
+		http.Error(w, "You need to be logged in!", http.StatusBadRequest)
 	}
-
-	has := segment.HasAttemptedAny(a, []int64{12083951})
-
-	content, _ := json.MarshalIndent(has, "", " ")
-	fmt.Fprint(w, string(content))
-
-	//err = renderTemplate("profile", w, Page{ })
+	log.Println(fmt.Sprintf("User #%d (%s %s) asked for a refresh.",
+		currentUser.Id, currentUser.FirstName, currentUser.LastName))
+	// TODO: Store access token in the database and get it here to send to RetrieveAthlete
+	// For now this is using my token
+	activity.RetrieveAthlete(access_token)
+	fmt.Fprint(w, "Your activities will be retrieved soon!")
 }
 
 func summitsHandler(w http.ResponseWriter, r *http.Request) {
-	summits, err:=storage.GetAllSummits()
+	summits, err := storage.GetAllSummits()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -177,14 +177,14 @@ func summitDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	check(renderTemplate("summit_details", w,r, Page{
+	check(renderTemplate("summit_details", w, r, Page{
 		Title: "Summit details",
-		Data: summit,
+		Data:  summit,
 	}))
 }
 
 func aboutPageHandler(w http.ResponseWriter, r *http.Request) {
-	check(renderTemplate("about", w,r, Page{
+	check(renderTemplate("about", w, r, Page{
 		Title: "About",
 	}))
 }

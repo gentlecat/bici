@@ -3,6 +3,7 @@ package main
 import (
 	"go.roman.zone/bici/server"
 	"go.roman.zone/bici/storage"
+	"go.roman.zone/bici/strava/activity"
 	"log"
 	"net/http"
 )
@@ -13,6 +14,8 @@ func main() {
 	}()
 
 	check(storage.EstablishConnection())
+	go activity.ActivityDetailsRetriever()
+	go activity.AthleteRetriever()
 	server.StartServer()
 }
 
