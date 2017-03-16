@@ -6,7 +6,7 @@
     {{range .Data}}
       <li>
         <img class="avatar" src="{{.Athlete.Profile}}" />
-        <a href="/athletes/{{.Athlete.Id}}">{{.Athlete.FirstName}} {{.Athlete.LastName}}</a> - {{.Points}}
+        <a class="name" href="/athletes/{{.Athlete.Id}}">{{.Athlete.FirstName}} {{.Athlete.LastName}}</a> - {{.Points}} points
       </li>
     {{end}}
   </ol>
