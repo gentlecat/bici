@@ -100,11 +100,11 @@ func ListTopAthletes() ([]*RatedAthlete, error) {
 		SELECT
 			athlete.data,
 			COALESCE(SUM(summit.points), 0) as total_points
-		FROM athlete
-		LEFT JOIN activity ON activity.id = athlete.id
-		LEFT JOIN activity_efforts ON activity_efforts.activity_id = activity.id
-		LEFT JOIN summit_segments ON summit_segments.segment_id = activity_efforts.segment_id
-		LEFT JOIN summit ON summit.id = summit_segments.summit_id
+		FROM summit
+		RIGHT JOIN summit_segments ON summit_segments.summit_id = summit.id
+		RIGHT JOIN activity_efforts ON activity_efforts.segment_id = summit_segments.segment_id
+		RIGHT JOIN activity ON activity.id = activity_efforts.activity_id
+		RIGHT JOIN athlete ON athlete.id = activity.athlete_id
 		GROUP BY athlete.id
 		ORDER BY total_points DESC
 		LIMIT 20
