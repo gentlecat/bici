@@ -3,15 +3,23 @@ package server
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/strava/go.strava"
 	"go.roman.zone/bici/storage"
 	"go.roman.zone/bici/strava/activity"
 	"log"
 	"net/http"
-	"github.com/strava/go.strava"
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	check(renderTemplate("index", w, r, Page{}))
+	topAthletes, err := storage.ListTopAthletes()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	check(renderTemplate("index", w, r, Page{
+		Data: topAthletes,
+	}))
 }
 
 func athleteDetailsHandler(w http.ResponseWriter, r *http.Request) {

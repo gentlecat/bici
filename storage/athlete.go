@@ -86,3 +86,48 @@ func GetAthletesAccessToken(athleteID int64) (accessToken string, err error) {
 	}
 	return accessToken, nil
 }
+
+type RatedAthlete struct {
+	Athlete strava.AthleteDetailed
+	Points  int
+}
+
+func ListTopAthletes() ([]*RatedAthlete, error) {
+	var athletes = make([]*RatedAthlete, 0)
+
+	// TODO: Maybe get just ones that have at least one point
+	rows, err := db.Query(`
+		SELECT
+			athlete.data,
+			COALESCE(SUM(summit.points), 0) as total_points
+		FROM athlete
+		LEFT JOIN activity ON activity.id = athlete.id
+		LEFT JOIN activity_efforts ON activity_efforts.activity_id = activity.id
+		LEFT JOIN summit_segments ON summit_segments.segment_id = activity_efforts.segment_id
+		LEFT JOIN summit ON summit.id = summit_segments.summit_id
+		GROUP BY athlete.id
+		ORDER BY total_points DESC
+		LIMIT 20
+	`)
+	if err != nil {
+		return athletes, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var athlete RatedAthlete
+
+		var athleteJSON string
+		if err := rows.Scan(&athleteJSON, &athlete.Points); err != nil {
+			return athletes, err
+		}
+		if err := json.Unmarshal([]byte(athleteJSON), &athlete.Athlete); err != nil {
+			return athletes, err
+		}
+		athletes = append(athletes, &athlete)
+	}
+	if err := rows.Err(); err != nil {
+		return athletes, err
+	}
+
+	return athletes, nil
+}

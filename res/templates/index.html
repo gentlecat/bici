@@ -1,5 +1,14 @@
 {{define "content"}}
 <div id="page-index">
-  Hello! This is an experiment.
+
+  <h2>Top athletes</h2>
+  <ol class="top-athletes">
+    {{range .Data}}
+      <li>
+        <a href="/athletes/{{.Athlete.Id}}">{{.Athlete.FirstName}} {{.Athlete.LastName}}</a> - {{.Points}}
+      </li>
+    {{end}}
+  </ol>
+
 </div>
 {{end}}
