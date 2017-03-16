@@ -145,9 +145,13 @@ func refreshHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println(fmt.Sprintf("User #%d (%s %s) asked for a refresh.",
 		currentUser.Id, currentUser.FirstName, currentUser.LastName))
-	// TODO: Store access token in the database and get it here to send to RetrieveAthlete
+	accessToken, err := storage.GetAthletesAccessToken(currentUser.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	// For now this is using my token
-	activity.RetrieveAthlete(access_token)
+	activity.RetrieveAthlete(accessToken)
 	fmt.Fprint(w, "Your activities will be retrieved soon!")
 }
 
