@@ -25,12 +25,12 @@ WORKDIR /go
 RUN go get -u github.com/peterbourgon/runsvinit
 RUN cp $GOPATH/bin/runsvinit /usr/local/bin/
 
-COPY . /go/src/go.roman.zone/bici
+COPY . /go/src/go.roman.zone/cazador
 RUN go get -v $(go list ./... | grep -v /vendor/)
-RUN go build go.roman.zone/bici
+RUN go build go.roman.zone/cazador
 
 # Styling
-WORKDIR /go/src/go.roman.zone/bici/res/static/styles
+WORKDIR /go/src/go.roman.zone/cazador/res/static/styles
 RUN gem install sass
 RUN scss main.scss:main.css
 

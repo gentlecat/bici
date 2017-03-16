@@ -46,7 +46,7 @@ func GetAthlete(id int64) (athlete strava.AthleteDetailed, err error) {
 	return athlete, nil
 }
 
-func BrowseAthletes(limit int, offset int) ( []strava.AthleteDetailed,  error){
+func BrowseAthletes(limit int, offset int) ([]strava.AthleteDetailed, error) {
 	// TODO: Integrate limit and offset (pagination)
 	// TODO: Order by points and select more data in general
 	athletes := make([]strava.AthleteDetailed, 0)

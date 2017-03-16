@@ -3,8 +3,8 @@ package activity
 import (
 	"fmt"
 	"github.com/strava/go.strava"
-	"go.roman.zone/bici/storage"
-	stravaWrapper "go.roman.zone/bici/strava"
+	"go.roman.zone/cazador/storage"
+	stravaWrapper "go.roman.zone/cazador/strava"
 	"log"
 	"time"
 )

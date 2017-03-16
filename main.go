@@ -1,9 +1,9 @@
 package main
 
 import (
-	"go.roman.zone/bici/server"
-	"go.roman.zone/bici/storage"
-	"go.roman.zone/bici/strava/activity"
+	"go.roman.zone/cazador/server"
+	"go.roman.zone/cazador/storage"
+	"go.roman.zone/cazador/strava/activity"
 	"log"
 	"net/http"
 )

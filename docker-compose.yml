@@ -27,6 +27,6 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - .:/go/src/go.roman.zone/bici
+      - .:/go/src/go.roman.zone/cazador
     links:
       - db

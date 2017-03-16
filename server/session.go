@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"github.com/strava/go.strava"
-	"go.roman.zone/bici/storage"
+	"go.roman.zone/cazador/storage"
 	"net/http"
 	"os"
 )
