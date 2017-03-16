@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/strava/go.strava"
-	"go.roman.zone/bici/storage"
-	"go.roman.zone/bici/strava/activity"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -29,6 +27,24 @@ func StartServer() {
 	log.Println("Initializing...")
 	initAll()
 
+	listenAddr := fmt.Sprintf("%s:%d", *listenHost, *listenPort)
+	log.Printf("Starting server on %s...\n", listenAddr)
+	check(http.ListenAndServe(listenAddr, makeRouter()))
+}
+
+func initAll() {
+	flag.Parse()
+	templLoc = filepath.Join(*resourcesLoc, "templates")
+	staticFilesLoc = filepath.Join(*resourcesLoc, "static")
+
+	renderTemplates(templLoc)
+
+	initOAuth()
+}
+
+func initOAuth() {
+	gob.Register(&UserSession{})
+
 	clientIDString := os.Getenv("STRAVA_CLIENT_ID")
 	if clientIDString == "" {
 		log.Fatal("STRAVA_CLIENT_ID env variable is missing")
@@ -47,20 +63,6 @@ func StartServer() {
 		CallbackURL:            callbackURL,
 		RequestClientGenerator: nil,
 	}
-
-	listenAddr := fmt.Sprintf("%s:%d", *listenHost, *listenPort)
-	log.Printf("Starting server on %s...\n", listenAddr)
-	check(http.ListenAndServe(listenAddr, makeRouter()))
-}
-
-func initAll() {
-	flag.Parse()
-	templLoc = filepath.Join(*resourcesLoc, "templates")
-	staticFilesLoc = filepath.Join(*resourcesLoc, "static")
-
-	renderTemplates(templLoc)
-
-	gob.Register(&UserSession{})
 }
 
 func makeRouter() *mux.Router {
@@ -85,111 +87,4 @@ func makeRouter() *mux.Router {
 	r.PathPrefix(staticPathPrefix).Handler(http.StripPrefix(staticPathPrefix, http.FileServer(http.Dir(staticFilesLoc))))
 
 	return r
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	check(renderTemplate("index", w, r, Page{}))
-}
-
-func athleteHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := atoi64(vars["id"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	athlete, err := storage.GetAthlete(id)
-	if err != nil {
-		// FIXME: This might not be a correct status to return (if athlete not found)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	summitActivities, err := storage.GetSummitActivities(athlete.Id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	check(renderTemplate("profile", w, r, Page{
-		Title: "Athlete",
-		Data: struct {
-			Athlete          *strava.AthleteDetailed
-			SummitActivities *[]*storage.SummitEffortActivity
-		}{
-			&athlete,
-			&summitActivities,
-		},
-	}))
-}
-
-func activityHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Shouldn't retrieve activities here!
-	vars := mux.Vars(r)
-	id, err := atoi64(vars["id"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	http.Error(w, fmt.Sprintf("Not implemented yet. Can't view activity %d. :(", id), http.StatusTeapot)
-}
-
-func refreshHandler(w http.ResponseWriter, r *http.Request) {
-	isLoggedIn, currentUser, err := GetCurrentSession(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	if !isLoggedIn {
-		http.Error(w, "You need to be logged in!", http.StatusBadRequest)
-	}
-	log.Println(fmt.Sprintf("User #%d (%s %s) asked for a refresh.",
-		currentUser.Id, currentUser.FirstName, currentUser.LastName))
-	accessToken, err := storage.GetAthletesAccessToken(currentUser.Id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	// For now this is using my token
-	activity.RetrieveAthlete(accessToken)
-	fmt.Fprint(w, "Your activities will be retrieved soon!")
-}
-
-func summitsHandler(w http.ResponseWriter, r *http.Request) {
-	summits, err := storage.GetAllSummits()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	check(renderTemplate("summit_list", w, r, Page{
-		Data: &summits,
-	}))
-}
-
-func summitDetailsHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: Show info about the summit, athletes who completed it
-	vars := mux.Vars(r)
-	id, err := atoi64(vars["id"])
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	summit, err := storage.GetSummit(id)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	check(renderTemplate("summit_details", w, r, Page{
-		Title: "Summit details",
-		Data:  summit,
-	}))
-}
-
-func aboutPageHandler(w http.ResponseWriter, r *http.Request) {
-	check(renderTemplate("about", w, r, Page{
-		Title: "About",
-	}))
 }
