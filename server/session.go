@@ -84,7 +84,7 @@ func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWrite
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf("%s://%s/athletes/%d", os.Getenv("OAUTH_CALLBACK_PROTOCOL"), os.Getenv("OAUTH_CALLBACK_HOST"), auth.Athlete.Id), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, fmt.Sprintf("/athletes/%d", auth.Athlete.Id), http.StatusTemporaryRedirect)
 }
 
 func authFailureHandler(err error, w http.ResponseWriter, r *http.Request) {
