@@ -35,7 +35,6 @@ func ActivityDetailsRetriever() {
 		stravaWrapper.RateLimitControl()
 		request, err := activityRetrievalQueue.Pop()
 		if err != nil {
-			log.Println("Activity queue is empty. Sleeping...")
 			time.Sleep(WORKER_SLEEP_TIME)
 			continue
 		}
@@ -59,7 +58,6 @@ func AthleteRetriever() {
 	for {
 		request, err := athleteRetrievalQueue.Pop()
 		if err != nil {
-			log.Println("Athlete queue is empty. Sleeping...")
 			time.Sleep(WORKER_SLEEP_TIME)
 			continue
 		}
