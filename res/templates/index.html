@@ -5,6 +5,7 @@
   <ol class="top-athletes">
     {{range .Data}}
       <li>
+        <img class="avatar" src="{{.Athlete.Profile}}" />
         <a href="/athletes/{{.Athlete.Id}}">{{.Athlete.FirstName}} {{.Athlete.LastName}}</a> - {{.Points}}
       </li>
     {{end}}
