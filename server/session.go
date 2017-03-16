@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/sessions"
 	"github.com/strava/go.strava"
 	"go.roman.zone/cazador/storage"
+	"go.roman.zone/cazador/strava/activity"
 	"net/http"
 	"os"
 )
@@ -80,6 +81,10 @@ func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWrite
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Retrieve all the previous activities for this athlete
+	// FIXME: This should be only done once when account is created
+	activity.RetrieveAthlete(auth.AccessToken)
 
 	http.Redirect(w, r, fmt.Sprintf("/athletes/%d", auth.Athlete.Id), http.StatusTemporaryRedirect)
 }
