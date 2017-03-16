@@ -1,8 +1,9 @@
 BEGIN;
 
 CREATE TABLE athlete (
-  id   BIGINT PRIMARY KEY,
-  data JSONB
+  id           BIGINT PRIMARY KEY,
+  data         JSONB,
+  access_token TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE summit (

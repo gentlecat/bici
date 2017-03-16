@@ -63,7 +63,11 @@ func AthleteRetriever() {
 			continue
 		}
 		log.Println(fmt.Sprintf("Getting data for athlete with token: %s", request.AccessToken))
-		retrieveActivitiesBetween(request.AccessToken, StartTime, EndTime)
+		err = retrieveActivitiesBetween(request.AccessToken, StartTime, EndTime)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 	}
 }
 

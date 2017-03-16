@@ -63,7 +63,6 @@ func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWrite
 	}
 
 	// Set some session values.
-	// TODO: Save access token maybe
 	session.Values[SESSION_KEY_USER] = UserSession{
 		ID: auth.Athlete.AthleteSummary.AthleteMeta.Id,
 	}
@@ -74,7 +73,7 @@ func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWrite
 		return
 	}
 
-	err = storage.SaveAthleteDetails(auth.Athlete)
+	err = storage.SaveLoginData(auth)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
