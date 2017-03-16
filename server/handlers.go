@@ -7,13 +7,14 @@ import (
 	"go.roman.zone/bici/strava/activity"
 	"log"
 	"net/http"
+	"github.com/strava/go.strava"
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	check(renderTemplate("index", w, r, Page{}))
 }
 
-func athleteHandler(w http.ResponseWriter, r *http.Request) {
+func athleteDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := atoi64(vars["id"])
 	if err != nil {
@@ -76,6 +77,18 @@ func refreshHandler(w http.ResponseWriter, r *http.Request) {
 	// For now this is using my token
 	activity.RetrieveAthlete(accessToken)
 	fmt.Fprint(w, "Your activities will be retrieved soon!")
+}
+
+func athletesHandler(w http.ResponseWriter, r *http.Request) {
+	// TODO: Add pagination
+	athletes, err := storage.BrowseAthletes(20, 0)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	check(renderTemplate("athlete_list", w, r, Page{
+		Data: &athletes,
+	}))
 }
 
 func summitsHandler(w http.ResponseWriter, r *http.Request) {

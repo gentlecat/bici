@@ -1,0 +1,15 @@
+{{define "content"}}
+<div id="page-athlete-list">
+  <h1 class="name">Athletes</h1>
+
+  <ul class="athletes">
+    {{range .Data}}
+      <li>
+        <img class="avatar" src="{{.Profile}}" />
+        <a href="/athletes/{{.Id}}">{{.FirstName}} {{.LastName}}</a>
+      </li>
+    {{end}}
+  </ul>
+
+</div>
+{{end}}

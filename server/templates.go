@@ -47,6 +47,7 @@ func renderTemplates(location string) {
 	templates = make(map[string]*template.Template)
 	templates["index"] = getTemplate(location, "index.html")
 	templates["about"] = getTemplate(location, "about.html")
+	templates["athlete_list"] = getTemplate(location, "athlete_list.html")
 	templates["profile"] = getTemplate(location, "profile.html")
 	templates["activity"] = getTemplate(location, "activity.html")
 	templates["summit_list"] = getTemplate(location, "summit_list.html")

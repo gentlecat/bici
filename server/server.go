@@ -70,7 +70,8 @@ func makeRouter() *mux.Router {
 
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/about", aboutPageHandler)
-	r.HandleFunc("/athletes/{id:[0-9]+}", athleteHandler)
+	r.HandleFunc("/athletes", athletesHandler)
+	r.HandleFunc("/athletes/{id:[0-9]+}", athleteDetailsHandler)
 	r.HandleFunc("/activities/{id:[0-9]+}", activityHandler)
 	r.HandleFunc("/refresh", refreshHandler)
 	r.HandleFunc("/summits", summitsHandler)

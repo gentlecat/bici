@@ -46,6 +46,35 @@ func GetAthlete(id int64) (athlete strava.AthleteDetailed, err error) {
 	return athlete, nil
 }
 
+func BrowseAthletes(limit int, offset int) ( []strava.AthleteDetailed,  error){
+	// TODO: Integrate limit and offset (pagination)
+	// TODO: Order by points and select more data in general
+	athletes := make([]strava.AthleteDetailed, 0)
+
+	rows, err := db.Query("SELECT data FROM athlete")
+	if err != nil {
+		return athletes, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var athlete strava.AthleteDetailed
+		var athleteJSON string
+		if err := rows.Scan(&athleteJSON); err != nil {
+			return athletes, err
+		}
+		err = json.Unmarshal([]byte(athleteJSON), &athlete)
+		if err != nil {
+			return athletes, err
+		}
+		athletes = append(athletes, athlete)
+	}
+	if err := rows.Err(); err != nil {
+		return athletes, err
+	}
+
+	return athletes, nil
+}
+
 func GetAthletesAccessToken(athleteID int64) (accessToken string, err error) {
 	err = db.QueryRow("SELECT access_token FROM athlete WHERE id = $1", athleteID).Scan(&accessToken)
 	switch {
