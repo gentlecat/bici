@@ -11,10 +11,10 @@
   </div>
 
   <h2 class="clear">Activities</h2>
-  <ul>
+  <ul class="activities">
     {{range .Data.SummitActivities}}
       <li>
-        {{.Activity.Name}}
+        <a class="name" href="https://www.strava.com/activities/{{.Activity.Id}}">{{.Activity.Name}}</a>
         <br /><span class="muted">Summit efforts: <a href="/summits/{{.Summit.ID}}">{{.Summit.Name}}</a> ({{.Summit.Points}}p)</span>
       </li>
     {{end}}
