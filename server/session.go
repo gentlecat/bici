@@ -20,9 +20,6 @@ var (
 	store = sessions.NewCookieStore([]byte(os.Getenv("COOKIE_KEY")))
 
 	stravaAuth *strava.OAuthAuthenticator
-
-	// TODO: REMOVE THIS:
-	access_token = os.Getenv("ACCESS_TOKEN")
 )
 
 type UserSession struct {

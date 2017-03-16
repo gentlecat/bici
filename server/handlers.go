@@ -82,7 +82,6 @@ func refreshHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	// For now this is using my token
 	activity.RetrieveAthlete(accessToken)
 	fmt.Fprint(w, "Your activities will be retrieved soon!")
 }
