@@ -93,6 +93,28 @@ func authFailureHandler(err error, w http.ResponseWriter, r *http.Request) {
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+	isLoggedIn, _, err := GetCurrentSession(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if isLoggedIn {
+		http.Error(w, "You are already logged in", http.StatusBadRequest)
+		return
+	}
 	http.Redirect(w, r, stravaAuth.AuthorizationURL("pointless_state", strava.Permissions.Public, true),
 		http.StatusTemporaryRedirect)
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	isLoggedIn, _, err := GetCurrentSession(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if !isLoggedIn {
+		http.Error(w, "You are not logged in", http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }

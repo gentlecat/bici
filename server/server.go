@@ -76,6 +76,7 @@ func makeRouter() *mux.Router {
 
 	// Strava OAuth
 	r.HandleFunc("/login", loginHandler)
+	r.HandleFunc("/logout", logoutHandler)
 	path, err := stravaAuth.CallbackPath()
 	check(err)
 	r.HandleFunc(path, stravaAuth.HandlerFunc(authSuccessHandler, authFailureHandler))
