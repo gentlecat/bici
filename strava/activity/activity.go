@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	WORKER_SLEEP_TIME_SEC = 4 * time.Second
+	WORKER_SLEEP_TIME = 4 * time.Second
 )
 
 var (
@@ -32,10 +32,11 @@ func RetrieveAthlete(accessToken string) {
 // activityRetrievalQueue and save detailed data in the database.
 func ActivityDetailsRetriever() {
 	for {
+		stravaWrapper.RateLimitControl()
 		request, err := activityRetrievalQueue.Pop()
 		if err != nil {
 			log.Println("Activity queue is empty. Sleeping...")
-			time.Sleep(WORKER_SLEEP_TIME_SEC)
+			time.Sleep(WORKER_SLEEP_TIME)
 			continue
 		}
 		// TODO: It might be a good idea to check if activity has already been retrieved before
@@ -59,7 +60,7 @@ func AthleteRetriever() {
 		request, err := athleteRetrievalQueue.Pop()
 		if err != nil {
 			log.Println("Athlete queue is empty. Sleeping...")
-			time.Sleep(WORKER_SLEEP_TIME_SEC)
+			time.Sleep(WORKER_SLEEP_TIME)
 			continue
 		}
 		log.Println(fmt.Sprintf("Getting data for athlete with token: %s", request.AccessToken))
@@ -82,8 +83,9 @@ func getActivity(client *strava.Client, id int64) (*strava.ActivityDetailed, err
 // associated with provided access token.
 func retrieveActivitiesBetween(accessToken string, start, end time.Time) error {
 	currentPage := 1
+	service := strava.NewCurrentAthleteService(strava.NewClient(accessToken))
 	for {
-		service := strava.NewCurrentAthleteService(strava.NewClient(accessToken))
+		stravaWrapper.RateLimitControl()
 		activities, err := service.ListActivities().
 			Page(currentPage).
 			// So apparently there's no good limit set on the number of
