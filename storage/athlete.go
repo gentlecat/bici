@@ -47,7 +47,7 @@ func GetAthlete(id int64) (athlete strava.AthleteDetailed, err error) {
 }
 
 func GetAthletesAccessToken(athleteID int64) (accessToken string, err error) {
-	err = db.QueryRow("SELECT acess_token FROM athlete WHERE id = $1", athleteID).Scan(&accessToken)
+	err = db.QueryRow("SELECT access_token FROM athlete WHERE id = $1", athleteID).Scan(&accessToken)
 	switch {
 	case err == sql.ErrNoRows:
 		// TODO: Make this error a constant in this package to be able to handle it later better
