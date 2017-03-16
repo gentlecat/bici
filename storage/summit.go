@@ -17,10 +17,10 @@ type Summit struct {
 	Segments []*strava.SegmentSummary
 }
 
-func GetAllSummits() ([]Summit,  error) {
+func GetAllSummits() ([]Summit, error) {
 	summits := make([]Summit, 0)
 
-	rows,err := db.Query("SELECT id, name, points FROM summit ORDER BY id")
+	rows, err := db.Query("SELECT id, name, points FROM summit ORDER BY id")
 	if err != nil {
 		return summits, err
 	}

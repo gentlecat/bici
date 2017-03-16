@@ -2,13 +2,13 @@ package server
 
 import (
 	"fmt"
+	"github.com/strava/go.strava"
 	"html/template"
 	"io"
 	"log"
+	"net/http"
 	"path/filepath"
 	"sync"
-	"github.com/strava/go.strava"
-	"net/http"
 )
 
 var (
@@ -63,18 +63,17 @@ func getTemplate(location, fileName string) *template.Template {
 func renderTemplate(name string, wr io.Writer, r *http.Request, data Page) error {
 	templatesMutex.Lock()
 	defer templatesMutex.Unlock()
-	isLoggedIn, currentUser , err:= GetCurrentSession(r)
+	isLoggedIn, currentUser, err := GetCurrentSession(r)
 	if err != nil {
 		log.Println(err)
 	}
 	return templates[name].ExecuteTemplate(wr, "base", struct {
 		Page
 		IsLoggedIn bool
-		User  *strava.AthleteDetailed
+		User       *strava.AthleteDetailed
 	}{
 		data,
 		isLoggedIn,
 		currentUser,
-
 	})
 }
