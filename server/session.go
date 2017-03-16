@@ -53,6 +53,11 @@ func GetCurrentSession(r *http.Request) (isLoggedIn bool, currentUser *strava.At
 	return true, &loggedInUser, nil
 }
 
+func PurgeCurrentSession(r *http.Request) error {
+	// TODO: Implement this
+	return nil
+}
+
 func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
 	// Get a session. We're ignoring the error resulted from decoding an
 	// existing session: Get() always returns a session, even if empty.
@@ -116,5 +121,6 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "You are not logged in", http.StatusBadRequest)
 		return
 	}
+	PurgeCurrentSession(r)
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
