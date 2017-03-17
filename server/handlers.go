@@ -165,7 +165,11 @@ func addSummitSegmentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	storage.AddSegmentToSummit(strava.NewClient(accessToken), summitID, segmentID)
+	err = storage.AddSegmentToSummit(strava.NewClient(accessToken), summitID, segmentID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	fmt.Fprint(w, fmt.Sprintf("Segment #%d has been added to summit #%d.", segmentID, summitID))
 }
 
