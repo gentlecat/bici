@@ -15,7 +15,7 @@ body {
 
   header {
     margin-top: 18px;
-    margin-bottom: 22px;
+    margin-bottom: 14px;
     font-size: 32px;
 
     display: flex;
@@ -23,6 +23,10 @@ body {
     display: -webkit-flex;
     flex-wrap: wrap;
     -webkit-flex-wrap: wrap;
+
+    .title {
+      font-family: "Montserrat", sans-serif;
+    }
 
     ul {
       clear: both;
@@ -56,6 +60,7 @@ body {
         li {
           float: left;
           margin-right: 20px;
+          font-weight: bold;
         }
       }
     }
@@ -114,6 +119,31 @@ body {
 
     }
 
+  }
+
+  .top-border {
+    background: #ecd241;
+    position: relative;
+    height: 1px;
+    margin-bottom: 30px;
+  }
+  .top-border:before {
+    content: '';
+    background: #cd3948;
+    width: 30%;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .top-border:after {
+    content: '';
+    background: #0994b7;
+    width: 30%;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    right: 0;
   }
 
   .content {
