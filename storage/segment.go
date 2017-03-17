@@ -29,7 +29,6 @@ func saveSegmentEfforts(activity *strava.ActivityDetailed) error {
 		return err
 	}
 	for _, effort := range activity.SegmentEfforts {
-
 		// Inserting info about the segment in case it's missing
 		segmentJSON, err := json.Marshal(effort.Segment)
 		if err != nil {
@@ -46,6 +45,25 @@ func saveSegmentEfforts(activity *strava.ActivityDetailed) error {
 	}
 	tx.Commit()
 
+	return nil
+}
+
+func AddSegment(segment strava.SegmentSummary) error {
+	athleteJSON, err := json.Marshal(segment)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`
+		INSERT INTO segment (id, data) VALUES ($1, $2)
+		ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data
+		`,
+		segment.Id,
+		athleteJSON,
+	)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

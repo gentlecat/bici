@@ -8,6 +8,7 @@ import (
 	"go.roman.zone/cazador/strava/activity"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
@@ -128,6 +129,44 @@ func summitDetailsHandler(w http.ResponseWriter, r *http.Request) {
 		Title: "Summit details",
 		Data:  summit,
 	}))
+}
+
+func addSummitSegmentHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	summitID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	isLoggedIn, currentUser, err := GetCurrentSession(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if !isLoggedIn {
+		http.Error(w, "You need to be logged in!", http.StatusBadRequest)
+	}
+	accessToken, err := storage.GetAthletesAccessToken(currentUser.Id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	queries := r.URL.Query()
+	segmentIDString, ok := queries["segment"]
+	if !ok {
+		http.Error(w, "No query", http.StatusBadRequest)
+		return
+	}
+	segmentID, err := atoi64(segmentIDString[0])
+	if err != nil {
+		http.Error(w, "Bad summit ID", http.StatusBadRequest)
+		return
+	}
+
+	storage.AddSegmentToSummit(strava.NewClient(accessToken), summitID, segmentID)
+	fmt.Fprint(w, fmt.Sprintf("Segment #%d has been added to summit #%d.", segmentID, summitID))
 }
 
 func aboutPageHandler(w http.ResponseWriter, r *http.Request) {

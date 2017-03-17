@@ -125,3 +125,18 @@ func GetSummitActivities(athleteID int64) ([]*SummitEffortActivity, error) {
 
 	return activities, nil
 }
+
+func AddSegmentToSummit(client *strava.Client, summitID int, segmentID int64) error {
+	service := strava.NewSegmentsService(client)
+	segmentDetails, err := service.Get(segmentID).Do()
+	AddSegment(segmentDetails.SegmentSummary)
+	_, err = db.Exec(
+		"INSERT INTO summit_segments (summit_id, segment_id) VALUES ($1, $2)",
+		summitID,
+		segmentID,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}

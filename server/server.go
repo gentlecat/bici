@@ -76,6 +76,7 @@ func makeRouter() *mux.Router {
 	r.HandleFunc("/refresh", refreshHandler)
 	r.HandleFunc("/summits", summitsHandler)
 	r.HandleFunc("/summits/{id:[0-9]+}", summitDetailsHandler)
+	r.HandleFunc("/summits/{id:[0-9]+}/add", addSummitSegmentHandler)
 
 	// Strava OAuth
 	r.HandleFunc("/login", loginHandler)
