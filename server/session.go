@@ -13,8 +13,8 @@ import (
 const (
 	CLUB_ID = 262311
 
-	SESSION_NAME     = "that_session"
-	SESSION_KEY_USER = "athlete"
+	SESSION_COOKIE_NAME = "session"
+	SESSION_KEY_USER    = "athlete"
 )
 
 var (
@@ -28,7 +28,7 @@ type UserSession struct {
 }
 
 func GetCurrentSession(r *http.Request) (isLoggedIn bool, currentUser *strava.AthleteDetailed, err error) {
-	session, err := store.Get(r, SESSION_NAME)
+	session, err := store.Get(r, SESSION_COOKIE_NAME)
 	if err != nil {
 		// No session
 		return false, currentUser, err
@@ -51,15 +51,19 @@ func GetCurrentSession(r *http.Request) (isLoggedIn bool, currentUser *strava.At
 	return true, &loggedInUser, nil
 }
 
-func PurgeCurrentSession(r *http.Request) error {
-	// TODO: Implement this
-	return nil
+func PurgeCurrentSession(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:   SESSION_COOKIE_NAME,
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	})
 }
 
 func authSuccessHandler(auth *strava.AuthorizationResponse, w http.ResponseWriter, r *http.Request) {
 	// Get a session. We're ignoring the error resulted from decoding an
 	// existing session: Get() always returns a session, even if empty.
-	session, err := store.Get(r, SESSION_NAME)
+	session, err := store.Get(r, SESSION_COOKIE_NAME)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -123,6 +127,6 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "You are not logged in", http.StatusBadRequest)
 		return
 	}
-	PurgeCurrentSession(r)
+	PurgeCurrentSession(w, r)
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }

@@ -25,6 +25,7 @@
   <div class="right">
     <ul>
       {{if .IsLoggedIn}}
+        <li><a href="/logout">Logout</a></li>
         <li class="user">
           <img class="avatar" src="{{.User.Profile}}" />
           <a class="name" href="/athletes/{{.User.Id}}">{{.User.FirstName}}</a>
