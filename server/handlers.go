@@ -146,6 +146,7 @@ func addSummitSegmentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !isLoggedIn {
 		http.Error(w, "You need to be logged in!", http.StatusBadRequest)
+		return
 	}
 	accessToken, err := storage.GetAthletesAccessToken(currentUser.Id)
 	if err != nil {
